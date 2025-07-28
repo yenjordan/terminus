@@ -23,7 +23,7 @@ jobs:
       - name: Check formatting with black
         run: |
           cd backend
-          black --check app/
+          black --check app/ || (echo "::error::Code formatting issues found. Run 'black app/' locally to fix." && exit 1)
 
   frontend-format:
     runs-on: ubuntu-latest
@@ -40,4 +40,4 @@ jobs:
       - name: Check formatting with prettier
         run: |
           cd frontend
-          npm run format:check
+          npm run format:check || (echo "::error::Code formatting issues found. Run 'npm run format' locally to fix." && exit 1)
