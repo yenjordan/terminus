@@ -1,0 +1,53 @@
+name: Format Code
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - format-code
+
+jobs:
+  format-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Format with black
+        run: |
+          cd backend
+          black app/
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Format backend code with black"
+          file_pattern: "backend/app/**/*.py"
+
+  format-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install --legacy-peer-deps
+      - name: Format with prettier
+        run: |
+          cd frontend
+          npm run format
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Format frontend code with prettier"
+          file_pattern: "frontend/src/**/*" 

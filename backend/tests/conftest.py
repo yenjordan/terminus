@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+import asyncio
 from typing import AsyncGenerator, Generator
 
 import pytest
@@ -26,6 +27,16 @@ from app.config import Settings, get_settings  # noqa: E402  pylint: disable=wro
 from app.db import Base  # noqa: E402  pylint: disable=wrong-import-position
 from app.db.database import get_db  # noqa: E402  pylint: disable=wrong-import-position
 from app.main import app  # noqa: E402  pylint: disable=wrong-import-position
+
+
+# Override the event_loop fixture to be session-scoped
+@pytest.fixture(scope="session")
+def event_loop():
+    """Create a session-scoped event loop."""
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
 
 
 # session-scoped helpers
