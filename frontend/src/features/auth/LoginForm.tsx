@@ -1,28 +1,19 @@
 import { useNavigate } from 'react-router-dom'
-import { Suspense, cache } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/input'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/Card'
-import { useToast } from '@/hooks/use-toast'
+import { useState } from 'react'
+import { Box, TextField, Button, Typography, CircularProgress } from '@mui/material'
 import { useAuth } from '@/context/AuthContext'
-import { useLoadingState } from '@/hooks/useLoadingState'
+import { useToast } from '@/hooks/use-toast'
 
-function LoginFormContent() {
+export default function LoginForm() {
   const navigate = useNavigate()
   const { login } = useAuth()
   const { toast } = useToast()
-  const { state, setLoading, setError } = useLoadingState('login-form')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const onSubmit = cache(async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setLoading(true)
+    setIsLoading(true)
     setError(null)
 
     const formData = new FormData(event.currentTarget)
@@ -36,7 +27,7 @@ function LoginFormContent() {
         title: 'Welcome back!',
         description: 'You have successfully logged in.',
       })
-      navigate('/dashboard')
+      navigate('/')
     } else {
       setError(result.error || 'An error occurred during login')
       toast({
@@ -46,63 +37,103 @@ function LoginFormContent() {
       })
     }
 
-    setLoading(false)
-  })
+    setIsLoading(false)
+  }
+
+  const textFieldSx = {
+    '& .MuiOutlinedInput-root': {
+      '&.Mui-focused fieldset': {
+        borderColor: 'rgba(144, 202, 249, 0.6)', // Lighter blue border
+      },
+      // Remove any background fill color
+      backgroundColor: 'transparent',
+      '&.Mui-focused': {
+        backgroundColor: 'transparent',
+      },
+      // Remove the filled style
+      '&.MuiFilledInput-root': {
+        backgroundColor: 'transparent',
+        '&:hover': {
+          backgroundColor: 'transparent',
+        },
+        '&.Mui-focused': {
+          backgroundColor: 'transparent',
+        }
+      }
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: 'rgba(144, 202, 249, 0.8)', // Lighter blue for label
+    },
+    // Ensure the input has no background
+    '& .MuiInputBase-input': {
+      backgroundColor: 'transparent',
+    }
+  };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>Enter your email below to login to your account</CardDescription>
-      </CardHeader>
-      <form onSubmit={onSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="name@example.com"
-              required
-              disabled={state.isLoading}
-              className="w-full"
-            />
-          </div>
-          <div className="space-y-2">
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              required
-              disabled={state.isLoading}
-              className="w-full"
-            />
-          </div>
-          {state.error && <div className="text-sm text-destructive">{state.error}</div>}
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/register')}
-            type="button"
-            disabled={state.isLoading}
-          >
-            Register
-          </Button>
-          <Button type="submit" disabled={state.isLoading}>
-            {state.isLoading ? 'Logging in...' : 'Login'}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
-  )
-}
-
-export default function LoginForm() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginFormContent />
-    </Suspense>
+    <form onSubmit={onSubmit}>
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          id="email"
+          name="email"
+          type="email"
+          label="Email"
+          placeholder="name@example.com"
+          required
+          disabled={isLoading}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          autoComplete="email"
+          autoFocus
+          sx={textFieldSx}
+          InputProps={{
+            sx: { backgroundColor: 'transparent' }
+          }}
+        />
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          id="password"
+          name="password"
+          type="password"
+          label="Password"
+          placeholder="Enter your password"
+          required
+          disabled={isLoading}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          autoComplete="current-password"
+          sx={textFieldSx}
+          InputProps={{
+            sx: { backgroundColor: 'transparent' }
+          }}
+        />
+      </Box>
+      {error && (
+        <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+        <Button
+          variant="outlined"
+          onClick={() => navigate('/register')}
+          type="button"
+          disabled={isLoading}
+        >
+          Register
+        </Button>
+        <Button 
+          type="submit" 
+          variant="contained" 
+          disabled={isLoading}
+          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
+        </Button>
+      </Box>
+    </form>
   )
 }

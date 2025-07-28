@@ -1,28 +1,20 @@
 import { useNavigate } from 'react-router-dom'
-import { Suspense, cache } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/input'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/Card'
-import { useToast } from '@/hooks/use-toast'
+import { useState } from 'react'
+import { Box, TextField, Button, Typography, CircularProgress, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import { useAuth } from '@/context/AuthContext'
-import { useLoadingState } from '@/hooks/useLoadingState'
+import { useToast } from '@/hooks/use-toast'
 
-function RegisterFormContent() {
+export default function RegisterForm() {
   const navigate = useNavigate()
   const { register } = useAuth()
   const { toast } = useToast()
-  const { state, setLoading, setError } = useLoadingState('register-form')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [role, setRole] = useState<'attempter' | 'reviewer'>('attempter')
 
-  const onSubmit = cache(async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setLoading(true)
+    setIsLoading(true)
     setError(null)
 
     const formData = new FormData(event.currentTarget)
@@ -33,11 +25,11 @@ function RegisterFormContent() {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match')
-      setLoading(false)
+      setIsLoading(false)
       return
     }
 
-    const result = await register({ email, username, password, confirmPassword })
+    const result = await register({ email, username, password, confirmPassword, role })
 
     if (result.success) {
       toast({
@@ -54,85 +46,130 @@ function RegisterFormContent() {
       })
     }
 
-    setLoading(false)
-  })
+    setIsLoading(false)
+  }
+
+  const textFieldSx = {
+    '& .MuiOutlinedInput-root': {
+      '&.Mui-focused fieldset': {
+        borderColor: 'rgba(144, 202, 249, 0.6)', // Lighter blue border
+      },
+      // Remove the background fill color
+      '&.Mui-focused': {
+        backgroundColor: 'transparent',
+      },
+      // Ensure background is always transparent
+      backgroundColor: 'transparent',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: 'rgba(144, 202, 249, 0.8)', // Lighter blue for label
+    }
+  };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Register</CardTitle>
-        <CardDescription>Create a new account</CardDescription>
-      </CardHeader>
-      <form onSubmit={onSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="name@example.com"
-              required
-              disabled={state.isLoading}
-              className="w-full"
-            />
-          </div>
-          <div className="space-y-2">
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              placeholder="Choose a username"
-              required
-              disabled={state.isLoading}
-              className="w-full"
-            />
-          </div>
-          <div className="space-y-2">
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              required
-              disabled={state.isLoading}
-              className="w-full"
-            />
-          </div>
-          <div className="space-y-2">
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              required
-              disabled={state.isLoading}
-              className="w-full"
-            />
-          </div>
-          {state.error && <div className="text-sm text-destructive">{state.error}</div>}
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/login')}
-            type="button"
-            disabled={state.isLoading}
+    <form onSubmit={onSubmit}>
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          id="email"
+          name="email"
+          type="email"
+          label="Email"
+          placeholder="name@example.com"
+          required
+          disabled={isLoading}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          autoComplete="email"
+          autoFocus
+          sx={textFieldSx}
+        />
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          id="username"
+          name="username"
+          type="text"
+          label="Username"
+          placeholder="Choose a username"
+          required
+          disabled={isLoading}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          autoComplete="username"
+          sx={textFieldSx}
+        />
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          id="password"
+          name="password"
+          type="password"
+          label="Password"
+          placeholder="Enter your password"
+          required
+          disabled={isLoading}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          autoComplete="new-password"
+          sx={textFieldSx}
+        />
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          label="Confirm Password"
+          placeholder="Confirm your password"
+          required
+          disabled={isLoading}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          autoComplete="new-password"
+          sx={textFieldSx}
+        />
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Register as</FormLabel>
+          <RadioGroup
+            row
+            name="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value as 'attempter' | 'reviewer')}
           >
-            Login
-          </Button>
-          <Button type="submit" disabled={state.isLoading}>
-            {state.isLoading ? 'Creating account...' : 'Register'}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
-  )
-}
-
-export default function RegisterForm() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <RegisterFormContent />
-    </Suspense>
+            <FormControlLabel value="attempter" control={<Radio />} label="Attempter" />
+            <FormControlLabel value="reviewer" control={<Radio />} label="Reviewer" />
+          </RadioGroup>
+        </FormControl>
+      </Box>
+      {error && (
+        <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+        <Button
+          variant="outlined"
+          onClick={() => navigate('/login')}
+          type="button"
+          disabled={isLoading}
+        >
+          Login
+        </Button>
+        <Button 
+          type="submit" 
+          variant="contained" 
+          disabled={isLoading}
+          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+        >
+          {isLoading ? 'Creating account...' : 'Register'}
+        </Button>
+      </Box>
+    </form>
   )
 }

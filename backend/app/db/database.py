@@ -18,12 +18,13 @@ def get_database_url() -> str:
     if settings.ENVIRONMENT == "testing" and settings.TEST_DATABASE_URL:
         return settings.TEST_DATABASE_URL
 
-    if settings.DB_NAME:
-        # PostgreSQL connection
+    # checking for a complete database configuration
+    if (settings.DB_NAME and settings.DB_USER and 
+        settings.DB_HOST and settings.DB_PORT):
         password = quote_plus(settings.DB_PASSWORD) if settings.DB_PASSWORD else ""
         return f"postgresql+asyncpg://{settings.DB_USER}:{password}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
 
-    raise ValueError("No database URL found")
+    return "sqlite+aiosqlite:///./terminus.db"
 
 
 def create_engine_with_retry(database_url: str):
@@ -53,10 +54,8 @@ def create_engine_with_retry(database_url: str):
     return create_async_engine(database_url, connect_args=connect_args, **pooling_args)
 
 
-# Create the engine
 engine = create_engine_with_retry(get_database_url())
 
-# Create async session maker
 AsyncSessionLocal = async_sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False, autocommit=False, autoflush=False
 )

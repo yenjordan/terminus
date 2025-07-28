@@ -20,7 +20,7 @@ def test_create_access_token_success():
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         assert payload.get("sub") == test_subject
         assert "exp" in payload
-        # Check if expiry is roughly correct (within a small delta)
+        # checking if expiry is roughly correct (within a small delta)
         expected_expiry = datetime.utcnow() + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
@@ -49,7 +49,7 @@ def test_create_access_token_different_data():
         pytest.fail("JWT decoding failed for token with additional data.")
 
 
-# Example of how you might test for expected failures if the function had validation
+# ex of how you might test for expected failures if the function had validation
 # (currently, create_access_token doesn't have input validation that would cause it to fail before encoding)
 # def test_create_access_token_missing_sub():
 #     """Test token creation fails if 'sub' is missing (if validation was added)."""

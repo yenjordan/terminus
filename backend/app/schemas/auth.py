@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 from pydantic import BaseModel, EmailStr
 
 
@@ -16,6 +16,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     username: str
     password: str
+    role: Literal["attempter", "reviewer"] = "attempter"  # default to attempter
 
 
 class LoginRequest(BaseModel):
@@ -33,5 +34,6 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }

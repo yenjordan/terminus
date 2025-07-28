@@ -29,10 +29,10 @@ export default function Home() {
     <div className="space-y-12 py-8">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4 text-foreground">
-          Welcome to FastAPI React Starter
+          Welcome to Terminus
         </h1>
         <p className="text-lg text-muted-foreground">
-          A modern full-stack starter template with React 19 and FastAPI
+          Advanced Python code execution platform with integrated terminal environment
         </p>
       </div>
 

@@ -1,99 +1,104 @@
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { AppProvider } from '../context/AppContext'
-import { Notification } from '../components/ui/Notification'
-import { ThemeToggle } from '../components/ui/ThemeToggle'
-import { useAuth } from '../context/AuthContext'
-import { Button } from '../components/ui/Button'
+import React from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import {
+  AppBar,
+  Box,
+  CssBaseline,
+  Toolbar,
+  Typography,
+  Button,
+  ThemeProvider,
+  createTheme,
+  IconButton,
+  useMediaQuery
+} from '@mui/material';
+import { 
+  Code as CodeIcon, 
+  Brightness4 as DarkModeIcon,
+  Brightness7 as LightModeIcon,
+  Login as LoginIcon,
+  Logout as LogoutIcon,
+  AppRegistration as RegisterIcon
+} from '@mui/icons-material';
 
-const publicNavLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/about', label: 'About' },
-] as const
+const RootLayout = () => {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const [darkMode, setDarkMode] = React.useState(true);
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  
+  React.useEffect(() => {
+    setDarkMode(prefersDarkMode);
+  }, [prefersDarkMode]);
 
-const privateNavLinks = [{ to: '/dashboard', label: 'Dashboard' }] as const
-
-function Navigation() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { isAuthenticated, logout } = useAuth()
-  const linkBase =
-    'text-card-foreground hover:text-primary hover:bg-accent/20 px-3 py-2 rounded-md text-sm font-medium transition-colors'
-  const activeLink = 'text-primary font-semibold underline underline-offset-4'
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: darkMode ? 'dark' : 'light',
+          primary: {
+            main: '#3f51b5',
+          },
+          secondary: {
+            main: '#f50057',
+          },
+          background: {
+            default: darkMode ? '#121212' : '#f5f5f5',
+            paper: darkMode ? '#1e1e1e' : '#ffffff',
+          },
+        },
+        typography: {
+          fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+        },
+      }),
+    [darkMode],
+  );
 
   const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+    logout();
+    navigate('/login');
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   return (
-    <nav className="bg-card text-card-foreground shadow-sm transition-colors">
-      <div className="container mx-auto px-6">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex space-x-8">
-            {publicNavLinks.map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                className={location.pathname === to ? `${linkBase} ${activeLink}` : linkBase}
-              >
-                {label}
-              </Link>
-            ))}
-            {isAuthenticated &&
-              privateNavLinks.map(({ to, label }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className={location.pathname === to ? `${linkBase} ${activeLink}` : linkBase}
-                >
-                  {label}
-                </Link>
-              ))}
-          </div>
-          <div className="flex items-center space-x-4">
-            <ThemeToggle />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <AppBar position="static" color="primary" elevation={0}>
+          <Toolbar>
+            <CodeIcon sx={{ mr: 2 }} />
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Terminus IDE
+            </Typography>
+            <IconButton color="inherit" onClick={toggleDarkMode}>
+              {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
             {isAuthenticated ? (
-              <Button
-                variant="ghost"
-                onClick={handleLogout}
-                className="text-card-foreground hover:text-primary hover:bg-accent/20"
-              >
+              <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
                 Logout
               </Button>
             ) : (
-              <Link
-                to="/login"
-                className={location.pathname === '/login' ? `${linkBase} ${activeLink}` : linkBase}
-              >
-                Login
-              </Link>
+              <>
+                <Button color="inherit" onClick={() => navigate('/login')} startIcon={<LoginIcon />}>
+                  Login
+                </Button>
+                <Button color="inherit" onClick={() => navigate('/register')} startIcon={<RegisterIcon />}>
+                  Register
+                </Button>
+              </>
             )}
-          </div>
-        </div>
-      </div>
-    </nav>
-  )
-}
-
-export default function RootLayout() {
-  const currentYear = new Date().getFullYear()
-
-  return (
-    <AppProvider>
-      <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors">
-        <Navigation />
-        <main className="flex-1 container mx-auto px-6 py-8">
+          </Toolbar>
+        </AppBar>
+        <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <Outlet />
-        </main>
-        <footer className="bg-card text-card-foreground shadow-sm transition-colors mt-auto">
-          <div className="container mx-auto px-6 py-4">
-            <p className="text-center text-muted-foreground">
-              {currentYear} FastAPI React Starter. All rights reserved.
-            </p>
-          </div>
-        </footer>
-        <Notification />
-      </div>
-    </AppProvider>
-  )
-}
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
+};
+
+export default RootLayout;

@@ -17,9 +17,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.pool import NullPool
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
-# ----------------------------------------------------------------------------
-# Ensure test settings are loaded and project root is importable
-# ----------------------------------------------------------------------------
+# making sure test settings are loaded and project root is importable
 os.environ.setdefault("ENVIRONMENT", "testing")
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, PROJECT_ROOT)
@@ -29,11 +27,8 @@ from app.db import Base  # noqa: E402  pylint: disable=wrong-import-position
 from app.db.database import get_db  # noqa: E402  pylint: disable=wrong-import-position
 from app.main import app  # noqa: E402  pylint: disable=wrong-import-position
 
-# ---------------------------------------------------------------------------
-# Session-scoped helpers
-# ---------------------------------------------------------------------------
 
-
+# session-scoped helpers
 @pytest.fixture(scope="session")
 def settings_instance() -> Settings:
     """Return fresh Settings for the test session."""
@@ -48,11 +43,7 @@ def effective_test_db_url(settings_instance: Settings) -> str:
     return url if url and url.lower() != "none" else settings_instance.DATABASE_URL
 
 
-# ---------------------------------------------------------------------------
-# Automatic DB lifecycle for the whole test session
-# ---------------------------------------------------------------------------
-
-
+# auto DB lifecycle for the whole test session
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def _session_db_lifecycle(effective_test_db_url: str):
     is_sqlite = effective_test_db_url.startswith("sqlite")
@@ -79,11 +70,7 @@ async def _session_db_lifecycle(effective_test_db_url: str):
         drop_database(sync_url)
 
 
-# ---------------------------------------------------------------------------
-# Per-test fixtures
-# ---------------------------------------------------------------------------
-
-
+# per test fixtures
 @pytest_asyncio.fixture()
 async def db_session(effective_test_db_url: str) -> AsyncGenerator[AsyncSession, None]:
     engine = create_async_engine(effective_test_db_url, poolclass=NullPool)

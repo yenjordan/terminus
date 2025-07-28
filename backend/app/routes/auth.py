@@ -54,7 +54,11 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
         )
 
     # Create new user
-    user = User(email=user_data.email, username=user_data.username)
+    user = User(
+        email=user_data.email, 
+        username=user_data.username,
+        role=user_data.role  # Set the role from request
+    )
     user.set_password(user_data.password)
 
     db.add(user)

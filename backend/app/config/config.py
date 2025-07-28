@@ -10,8 +10,8 @@ load_dotenv()
 
 class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
-    APP_NAME: str = "FastAPI React Starter"
-    APP_DESCRIPTION: str = "FastAPI React Starter Template"
+    APP_NAME: str = "Terminus"
+    APP_DESCRIPTION: str = "Code Execution Platform with Integrated Terminal"
     ENVIRONMENT: str = "development"
     DATABASE_URL: str = ""
     TEST_DATABASE_URL: Optional[str] = "sqlite+aiosqlite:///./test_app.db"
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # JWT Settings
     SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "secret-key-for-development")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours for development
 
     class Config:
         env_file = ".env"

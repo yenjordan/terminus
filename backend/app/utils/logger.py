@@ -11,7 +11,7 @@ from app.config import CURRENT_LOGGING_CONFIG
 class CustomFormatter(logging.Formatter):
     """Custom formatter with colors for console output"""
 
-    # Color codes
+    # color codes
     grey = "\x1b[38;21m"
     blue = "\x1b[38;5;39m"
     yellow = "\x1b[38;5;226m"
@@ -71,24 +71,24 @@ def setup_logger(
     Returns:
         logging.Logger: Configured logger instance
     """
-    # Create logger
+    # creating logger
     logger = logging.getLogger(name)
     logger.setLevel(getattr(logging, log_level.upper()))
 
-    # Remove existing handlers
+    # removing existing handlers
     logger.handlers = []
 
-    # Console Handler
+    # console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(CustomFormatter())
     logger.addHandler(console_handler)
 
-    # File Handler (if log_dir is provided)
+    # file handler (if log_dir is provided)
     if log_dir:
         log_dir = Path(log_dir)
         log_dir.mkdir(parents=True, exist_ok=True)
 
-        # Regular log file
+        # regular log file
         file_handler = RotatingFileHandler(
             filename=log_dir / f"{name}.log",
             maxBytes=10485760,  # 10MB
@@ -98,7 +98,7 @@ def setup_logger(
         file_handler.setFormatter(JSONFormatter())
         logger.addHandler(file_handler)
 
-        # Error log file
+        # error log file
         error_handler = RotatingFileHandler(
             filename=log_dir / f"{name}.error.log",
             maxBytes=10485760,  # 10MB
