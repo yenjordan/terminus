@@ -25,3 +25,7 @@ Terminus is a web-based Python code execution platform featuring an integrated t
 3. **Access the application**
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8000
+
+## Technical Architecture
+
+### System Overview
