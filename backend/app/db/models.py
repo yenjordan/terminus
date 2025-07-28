@@ -43,12 +43,17 @@ class User(Base):
 
     # Relationships
     code_sessions = relationship("CodeSession", back_populates="user", cascade="all, delete-orphan")
-    code_submissions = relationship("CodeSubmission", back_populates="user", cascade="all, delete-orphan")
-    code_reviews = relationship("CodeReview", back_populates="reviewer", cascade="all, delete-orphan")
+    code_submissions = relationship(
+        "CodeSubmission", back_populates="user", cascade="all, delete-orphan"
+    )
+    code_reviews = relationship(
+        "CodeReview", back_populates="reviewer", cascade="all, delete-orphan"
+    )
 
 
 class CodeSession(Base):
     """User coding sessions/workspaces"""
+
     __tablename__ = "code_sessions"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -63,11 +68,14 @@ class CodeSession(Base):
     # Relationships
     user = relationship("User", back_populates="code_sessions")
     files = relationship("CodeFile", back_populates="session", cascade="all, delete-orphan")
-    executions = relationship("CodeExecution", back_populates="session", cascade="all, delete-orphan")
+    executions = relationship(
+        "CodeExecution", back_populates="session", cascade="all, delete-orphan"
+    )
 
 
 class CodeFile(Base):
     """Files stored in user workspaces"""
+
     __tablename__ = "code_files"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -86,6 +94,7 @@ class CodeFile(Base):
 
 class CodeExecution(Base):
     """Track code execution history"""
+
     __tablename__ = "code_executions"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -106,13 +115,16 @@ class CodeExecution(Base):
 
 class CodeSubmission(Base):
     """Code submissions for review"""
+
     __tablename__ = "code_submissions"
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    session_id = Column(Integer, ForeignKey("code_sessions.id"), nullable=True)  # Optional link to session
+    session_id = Column(
+        Integer, ForeignKey("code_sessions.id"), nullable=True
+    )  # Optional link to session
     code_content = Column(Text, nullable=False)  # Snapshot of code at submission
     files_snapshot = Column(JSON, nullable=True)  # JSON snapshot of all files
     status = Column(String, default="pending")  # pending, approved, rejected, revision_requested
@@ -127,6 +139,7 @@ class CodeSubmission(Base):
 
 class CodeReview(Base):
     """Reviews for code submissions"""
+
     __tablename__ = "code_reviews"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -135,13 +148,15 @@ class CodeReview(Base):
     status = Column(String, nullable=False)  # approved, rejected, revision_requested
     comments = Column(Text, nullable=True)
     feedback = Column(Text, nullable=True)
-    
+
     # New quality assessment fields
     quality_before_edits = Column(Integer, nullable=True)  # 1-5 rating scale
-    quality_after_edits = Column(Integer, nullable=True)   # 1-5 rating scale
-    edits_made = Column(Text, nullable=True)               # Description of edits made
-    is_customer_ready = Column(Boolean, nullable=True)     # Whether task is good enough to send to customer
-    
+    quality_after_edits = Column(Integer, nullable=True)  # 1-5 rating scale
+    edits_made = Column(Text, nullable=True)  # Description of edits made
+    is_customer_ready = Column(
+        Boolean, nullable=True
+    )  # Whether task is good enough to send to customer
+
     review_time_minutes = Column(Float, nullable=True)  # Time spent reviewing
     created_at = Column(DateTime, default=func.now())
 

@@ -2,7 +2,7 @@ import { createContext, useContext, useReducer, ReactNode, useCallback, useEffec
 import { AuthState, LoginCredentials, RegisterCredentials, AuthResult, User } from '@/types/auth'
 
 // Use the proxy configuration instead of hardcoded URL
-const API_URL = ''  // Empty string will use relative URLs with the proxy
+const API_URL = '' // Empty string will use relative URLs with the proxy
 
 // Action types
 export const AUTH_ACTIONS = {
@@ -77,99 +77,102 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const fetchUserData = useCallback(async () => {
-    if (!state.token) return;
-    
+    if (!state.token) return
+
     try {
       const response = await fetch(`${API_URL}/api/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${state.token}`
-        }
-      });
-      
+          Authorization: `Bearer ${state.token}`,
+        },
+      })
+
       if (response.ok) {
-        const userData = await response.json();
-        dispatch({ type: AUTH_ACTIONS.SET_USER, payload: userData });
+        const userData = await response.json()
+        dispatch({ type: AUTH_ACTIONS.SET_USER, payload: userData })
       } else {
         // If we can't fetch user data, token might be invalid
         if (response.status === 401) {
-          logout();
+          logout()
         }
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Error fetching user data:', error)
     }
-  }, [state.token, logout]);
+  }, [state.token, logout])
 
   // Fetch user data on initial load if token exists
   useEffect(() => {
     if (state.isAuthenticated && !state.user) {
-      fetchUserData();
+      fetchUserData()
     }
-  }, [state.isAuthenticated, state.user, fetchUserData]);
+  }, [state.isAuthenticated, state.user, fetchUserData])
 
-  const login = useCallback(async (credentials: LoginCredentials): Promise<AuthResult> => {
-    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true })
+  const login = useCallback(
+    async (credentials: LoginCredentials): Promise<AuthResult> => {
+      dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true })
 
-    try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      })
-
-      // Check if response is ok before trying to parse JSON
-      if (!response.ok) {
-        let errorMessage = 'Login failed';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.detail || errorMessage;
-        } catch (jsonError) {
-          console.error('Error parsing error response:', jsonError);
-          // Use status text if JSON parsing fails
-          errorMessage = response.statusText || errorMessage;
-        }
-        
-        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false })
-        return {
-          success: false,
-          error: errorMessage,
-        }
-      }
-      
-      // Parse the successful response
-      let data;
       try {
-        data = await response.json();
-      } catch (jsonError) {
-        console.error('Error parsing successful response:', jsonError);
+        const response = await fetch(`${API_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(credentials),
+        })
+
+        // Check if response is ok before trying to parse JSON
+        if (!response.ok) {
+          let errorMessage = 'Login failed'
+          try {
+            const errorData = await response.json()
+            errorMessage = errorData.detail || errorMessage
+          } catch (jsonError) {
+            console.error('Error parsing error response:', jsonError)
+            // Use status text if JSON parsing fails
+            errorMessage = response.statusText || errorMessage
+          }
+
+          dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false })
+          return {
+            success: false,
+            error: errorMessage,
+          }
+        }
+
+        // Parse the successful response
+        let data
+        try {
+          data = await response.json()
+        } catch (jsonError) {
+          console.error('Error parsing successful response:', jsonError)
+          dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false })
+          return {
+            success: false,
+            error: 'Invalid response from server',
+          }
+        }
+
+        localStorage.setItem('token', data.access_token)
+        dispatch({
+          type: AUTH_ACTIONS.LOGIN_SUCCESS,
+          payload: { token: data.access_token },
+        })
+
+        // Fetch user data after successful login
+        await fetchUserData()
+
+        return { success: true, error: null }
+      } catch (error) {
+        console.error('Login error:', error)
         dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false })
         return {
           success: false,
-          error: 'Invalid response from server',
+          error: error instanceof Error ? error.message : 'Login failed',
         }
       }
-
-      localStorage.setItem('token', data.access_token)
-      dispatch({
-        type: AUTH_ACTIONS.LOGIN_SUCCESS,
-        payload: { token: data.access_token },
-      })
-
-      // Fetch user data after successful login
-      await fetchUserData();
-
-      return { success: true, error: null }
-    } catch (error) {
-      console.error('Login error:', error);
-      dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false })
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Login failed',
-      }
-    }
-  }, [fetchUserData])
+    },
+    [fetchUserData]
+  )
 
   const register = useCallback(
     async (credentials: RegisterCredentials): Promise<AuthResult> => {

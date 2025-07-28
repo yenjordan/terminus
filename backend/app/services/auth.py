@@ -22,16 +22,16 @@ async def get_current_user_from_token(token: str, db: AsyncSession) -> User | No
         # Decode the token
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
-        
+
         if email is None:
             return None
-            
+
         # Get user from database
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
-        
+
         return user
-        
+
     except JWTError:
         return None
     except Exception:
@@ -40,23 +40,23 @@ async def get_current_user_from_token(token: str, db: AsyncSession) -> User | No
 
 class AuthService:
     """Authentication service for user management"""
-    
+
     async def get_current_user_from_token(self, token: str, db: AsyncSession) -> User | None:
         """Get user from JWT token"""
         try:
             # Decode the token
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             email: str = payload.get("sub")
-            
+
             if email is None:
                 return None
-                
+
             # Get user from database
             result = await db.execute(select(User).where(User.email == email))
             user = result.scalar_one_or_none()
-            
+
             return user
-            
+
         except JWTError:
             return None
         except Exception:

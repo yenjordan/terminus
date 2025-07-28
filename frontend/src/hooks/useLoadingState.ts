@@ -8,16 +8,16 @@ interface LoadingState {
 export function useLoadingState(id: string) {
   const [state, setState] = useState<LoadingState>({
     isLoading: false,
-    error: null
-  });
+    error: null,
+  })
 
   const setLoading = (isLoading: boolean) => {
-    setState(prevState => ({ ...prevState, isLoading }));
-  };
+    setState((prevState) => ({ ...prevState, isLoading }))
+  }
 
   const setError = (error: string | null) => {
-    setState(prevState => ({ ...prevState, error }));
-  };
+    setState((prevState) => ({ ...prevState, error }))
+  }
 
-  return { state, setLoading, setError };
+  return { state, setLoading, setError }
 }

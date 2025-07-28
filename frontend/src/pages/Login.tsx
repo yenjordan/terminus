@@ -5,24 +5,26 @@ import CodeIcon from '@mui/icons-material/Code'
 
 export default function Login() {
   return (
-    <Box sx={{ 
-      height: 'calc(100vh - 64px)', 
-      display: 'flex', 
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      bgcolor: 'background.default',
-      p: 2
-    }}>
-      <Paper 
-        elevation={0} 
-        sx={{ 
+    <Box
+      sx={{
+        height: 'calc(100vh - 64px)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: 'background.default',
+        p: 2,
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
           maxWidth: 500,
           width: '100%',
           p: 3,
           border: '1px solid',
           borderColor: 'divider',
-          borderRadius: 1
+          borderRadius: 1,
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>

@@ -58,8 +58,8 @@ export default function LoginForm() {
         },
         '&.Mui-focused': {
           backgroundColor: 'transparent',
-        }
-      }
+        },
+      },
     },
     '& .MuiInputLabel-root.Mui-focused': {
       color: 'rgba(144, 202, 249, 0.8)', // Lighter blue for label
@@ -67,8 +67,8 @@ export default function LoginForm() {
     // Ensure the input has no background
     '& .MuiInputBase-input': {
       backgroundColor: 'transparent',
-    }
-  };
+    },
+  }
 
   return (
     <form onSubmit={onSubmit}>
@@ -88,7 +88,7 @@ export default function LoginForm() {
           autoFocus
           sx={textFieldSx}
           InputProps={{
-            sx: { backgroundColor: 'transparent' }
+            sx: { backgroundColor: 'transparent' },
           }}
         />
       </Box>
@@ -107,7 +107,7 @@ export default function LoginForm() {
           autoComplete="current-password"
           sx={textFieldSx}
           InputProps={{
-            sx: { backgroundColor: 'transparent' }
+            sx: { backgroundColor: 'transparent' },
           }}
         />
       </Box>
@@ -125,9 +125,9 @@ export default function LoginForm() {
         >
           Register
         </Button>
-        <Button 
-          type="submit" 
-          variant="contained" 
+        <Button
+          type="submit"
+          variant="contained"
           disabled={isLoading}
           startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
         >

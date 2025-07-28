@@ -19,8 +19,7 @@ def get_database_url() -> str:
         return settings.TEST_DATABASE_URL
 
     # checking for a complete database configuration
-    if (settings.DB_NAME and settings.DB_USER and 
-        settings.DB_HOST and settings.DB_PORT):
+    if settings.DB_NAME and settings.DB_USER and settings.DB_HOST and settings.DB_PORT:
         password = quote_plus(settings.DB_PASSWORD) if settings.DB_PASSWORD else ""
         return f"postgresql+asyncpg://{settings.DB_USER}:{password}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
 

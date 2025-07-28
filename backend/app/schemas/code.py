@@ -127,9 +127,9 @@ class CodeReviewCreate(BaseModel):
     comments: Optional[str] = None
     feedback: Optional[str] = None
     quality_before_edits: Optional[int] = None  # 1-5 rating scale
-    quality_after_edits: Optional[int] = None   # 1-5 rating scale
-    edits_made: Optional[str] = None            # descriptoin of edits made
-    is_customer_ready: Optional[bool] = None    # if task is good enough to send to customer
+    quality_after_edits: Optional[int] = None  # 1-5 rating scale
+    edits_made: Optional[str] = None  # descriptoin of edits made
+    is_customer_ready: Optional[bool] = None  # if task is good enough to send to customer
 
 
 class CodeReviewUpdate(BaseModel):
@@ -192,7 +192,7 @@ class FileSystemResponse(BaseModel):
 # more code review Scchemas
 class CodeSubmissionListResponse(BaseModel):
     """Response schema for code submission list"""
-    
+
     id: int
     title: str
     description: Optional[str]
@@ -201,4 +201,4 @@ class CodeSubmissionListResponse(BaseModel):
     created_at: datetime
     code_content: str  # code content for review
 
-    model_config = ConfigDict(from_attributes=True) 
+    model_config = ConfigDict(from_attributes=True)

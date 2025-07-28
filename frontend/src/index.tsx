@@ -7,16 +7,18 @@ import { AuthProvider } from './context/AuthContext'
 // Error handling
 const ErrorFallback = () => {
   return (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column',
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      height: '100vh',
-      padding: '20px',
-      backgroundColor: '#f0f0f0',
-      color: '#333'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        padding: '20px',
+        backgroundColor: '#f0f0f0',
+        color: '#333',
+      }}
+    >
       <h1>Something went wrong</h1>
       <p>An error occurred while loading the application.</p>
       <p>Please check the browser console for more details.</p>
@@ -24,8 +26,8 @@ const ErrorFallback = () => {
   )
 }
 
-class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
-  constructor(props: {children: React.ReactNode}) {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
     super(props)
     this.state = { hasError: false }
   }
@@ -63,6 +65,7 @@ if (rootElement) {
     console.log('App rendered successfully')
   } catch (error) {
     console.error('Error rendering app:', error)
-    rootElement.innerHTML = '<div style="padding: 20px; text-align: center;"><h1>Failed to load application</h1><p>Please check the console for errors.</p></div>'
+    rootElement.innerHTML =
+      '<div style="padding: 20px; text-align: center;"><h1>Failed to load application</h1><p>Please check the console for errors.</p></div>'
   }
 }

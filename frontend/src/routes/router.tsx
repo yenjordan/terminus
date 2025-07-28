@@ -1,21 +1,21 @@
-import React, { useEffect } from 'react';
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
-import IDE from '../pages/IDE';
-import RootLayout from '../layouts/RootLayout';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect } from 'react'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import Login from '../pages/Login'
+import Register from '../pages/Register'
+import IDE from '../pages/IDE'
+import RootLayout from '../layouts/RootLayout'
+import { useAuth } from '../context/AuthContext'
 
 // Create a router with protected routes
 const Router: React.FC = () => {
-  const { isAuthenticated, user, fetchUserData } = useAuth();
+  const { isAuthenticated, user, fetchUserData } = useAuth()
 
   // Fetch user data when authenticated
   useEffect(() => {
     if (isAuthenticated && !user) {
-      fetchUserData();
+      fetchUserData()
     }
-  }, [isAuthenticated, user, fetchUserData]);
+  }, [isAuthenticated, user, fetchUserData])
 
   const router = createBrowserRouter([
     {
@@ -44,9 +44,9 @@ const Router: React.FC = () => {
         },
       ],
     },
-  ]);
+  ])
 
-  return <RouterProvider router={router} />;
-};
+  return <RouterProvider router={router} />
+}
 
-export default Router;
+export default Router

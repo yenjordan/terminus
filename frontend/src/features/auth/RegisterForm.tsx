@@ -1,6 +1,17 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { Box, TextField, Button, Typography, CircularProgress, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material'
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from '@mui/material'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 
@@ -63,8 +74,8 @@ export default function RegisterForm() {
     },
     '& .MuiInputLabel-root.Mui-focused': {
       color: 'rgba(144, 202, 249, 0.8)', // Lighter blue for label
-    }
-  };
+    },
+  }
 
   return (
     <form onSubmit={onSubmit}>
@@ -161,9 +172,9 @@ export default function RegisterForm() {
         >
           Login
         </Button>
-        <Button 
-          type="submit" 
-          variant="contained" 
+        <Button
+          type="submit"
+          variant="contained"
           disabled={isLoading}
           startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
         >

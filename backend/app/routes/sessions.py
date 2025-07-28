@@ -5,9 +5,7 @@ from typing import List, Optional
 from app.db.database import get_db
 from app.db.models import User
 from app.routes.auth import get_current_user
-from app.schemas.code import (
-    CodeSessionCreate, CodeSessionUpdate, CodeSessionResponse
-)
+from app.schemas.code import CodeSessionCreate, CodeSessionUpdate, CodeSessionResponse
 from app.services.session import session_service
 from app.utils.logger import setup_logger
 
@@ -19,10 +17,10 @@ router = APIRouter(prefix="/sessions", tags=["sessions"])
 async def create_session(
     session_data: CodeSessionCreate,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Create a new code session"""
-    
+
     try:
         session = await session_service.create_session(db, session_data, current_user.id)
         return session
@@ -37,10 +35,10 @@ async def create_session(
 async def get_user_sessions(
     active_only: bool = False,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Get all sessions for the current user"""
-    
+
     try:
         sessions = await session_service.get_user_sessions(db, current_user.id, active_only)
         return sessions
@@ -53,10 +51,10 @@ async def get_user_sessions(
 async def get_session(
     session_id: int,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Get a specific session by ID"""
-    
+
     try:
         session = await session_service.get_session(db, session_id, current_user.id)
         if not session:
@@ -74,12 +72,14 @@ async def update_session(
     session_id: int,
     session_update: CodeSessionUpdate,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Update a session"""
-    
+
     try:
-        session = await session_service.update_session(db, session_id, session_update, current_user.id)
+        session = await session_service.update_session(
+            db, session_id, session_update, current_user.id
+        )
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
         return session
@@ -94,10 +94,10 @@ async def update_session(
 async def delete_session(
     session_id: int,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Delete a session and all its files"""
-    
+
     try:
         success = await session_service.delete_session(db, session_id, current_user.id)
         if not success:
@@ -114,10 +114,10 @@ async def delete_session(
 async def activate_session(
     session_id: int,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Activate a session"""
-    
+
     try:
         success = await session_service.activate_session(db, session_id, current_user.id)
         if not success:
@@ -134,10 +134,10 @@ async def activate_session(
 async def deactivate_session(
     session_id: int,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Deactivate a session"""
-    
+
     try:
         success = await session_service.deactivate_session(db, session_id, current_user.id)
         if not success:
@@ -154,10 +154,10 @@ async def deactivate_session(
 async def get_session_stats(
     session_id: int,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """Get statistics for a session"""
-    
+
     try:
         stats = await session_service.get_session_stats(db, session_id, current_user.id)
         if not stats:
@@ -167,4 +167,4 @@ async def get_session_stats(
         raise
     except Exception as e:
         logger.error(f"Error getting session stats: {e}")
-        raise HTTPException(status_code=500, detail="Failed to get session statistics") 
+        raise HTTPException(status_code=500, detail="Failed to get session statistics")

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  Button, 
-  TextField, 
-  Tabs, 
-  Tab, 
+import React, { useState, useEffect } from 'react'
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  Tabs,
+  Tab,
   CircularProgress,
   List,
   ListItem,
@@ -15,126 +15,126 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
-} from '@mui/material';
-import Editor from '@monaco-editor/react';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@mui/material/styles';
+  DialogActions,
+} from '@mui/material'
+import Editor from '@monaco-editor/react'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '@/hooks/use-toast'
+import { useTheme } from '@mui/material/styles'
 
 interface CodeSubmissionProps {
-  onClose: () => void;
+  onClose: () => void
   currentFile?: {
-    id: number;
-    name: string;
-    content: string;
-  };
-  sessionId?: number;
+    id: number
+    name: string
+    content: string
+  }
+  sessionId?: number
 }
 
 interface Submission {
-  id: number;
-  title: string;
-  description: string;
-  code_content: string;
-  status: 'pending' | 'approved' | 'rejected' | 'revision_requested';
-  created_at: string;
+  id: number
+  title: string
+  description: string
+  code_content: string
+  status: 'pending' | 'approved' | 'rejected' | 'revision_requested'
+  created_at: string
 }
 
 interface Review {
-  id: number;
-  reviewer_id: number;
-  status: string;
-  comments: string;
-  feedback: string;
-  quality_before_edits: number;
-  quality_after_edits: number;
-  edits_made: string;
-  is_customer_ready: boolean;
-  created_at: string;
+  id: number
+  reviewer_id: number
+  status: string
+  comments: string
+  feedback: string
+  quality_before_edits: number
+  quality_after_edits: number
+  edits_made: string
+  is_customer_ready: boolean
+  created_at: string
 }
 
 export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissionProps) {
-  const { token } = useAuth();
-  const { toast } = useToast();
-  const theme = useTheme();
-  const isDarkMode = theme.palette.mode === 'dark';
-  const [activeTab, setActiveTab] = useState(0);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const { token } = useAuth()
+  const { toast } = useToast()
+  const theme = useTheme()
+  const isDarkMode = theme.palette.mode === 'dark'
+  const [activeTab, setActiveTab] = useState(0)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   // Load user's submissions
   useEffect(() => {
     if (token) {
-      loadSubmissions();
+      loadSubmissions()
     }
-  }, [token]);
+  }, [token])
 
   const loadSubmissions = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       const response = await fetch('/api/code-review/submissions/', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (response.ok) {
-        const data = await response.json();
-        setSubmissions(data);
+        const data = await response.json()
+        setSubmissions(data)
       } else {
-        console.error('Failed to load submissions:', response.status, response.statusText);
+        console.error('Failed to load submissions:', response.status, response.statusText)
         toast({
           variant: 'destructive',
           title: 'Error',
           description: 'Failed to load submissions',
-        });
+        })
       }
     } catch (error) {
-      console.error('Error loading submissions:', error);
+      console.error('Error loading submissions:', error)
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to load submissions',
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const loadReviews = async (submissionId: number) => {
     try {
       const response = await fetch(`/api/code-review/submissions/${submissionId}/reviews/`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (response.ok) {
-        const data = await response.json();
-        setReviews(data);
+        const data = await response.json()
+        setReviews(data)
       } else {
         toast({
           variant: 'destructive',
           title: 'Error',
           description: 'Failed to load reviews',
-        });
+        })
       }
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      console.error('Error loading reviews:', error)
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to load reviews',
-      });
+      })
     }
-  };
+  }
 
   const handleSubmit = async () => {
     if (!currentFile) {
@@ -142,8 +142,8 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
         variant: 'destructive',
         title: 'Error',
         description: 'No file selected for submission',
-      });
-      return;
+      })
+      return
     }
 
     if (!title.trim()) {
@@ -151,11 +151,11 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
         variant: 'destructive',
         title: 'Error',
         description: 'Please enter a title for your submission',
-      });
-      return;
+      })
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
       console.log('Submitting code with data:', {
@@ -164,13 +164,13 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
         title,
         description,
         code_content: currentFile.content,
-      });
-      
+      })
+
       const response = await fetch('/api/code-review/submissions/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           session_id: sessionId || null,
@@ -179,99 +179,117 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
           description: description,
           code_content: currentFile.content,
         }),
-      });
+      })
 
       if (response.ok) {
-        const data = await response.json();
-        console.log('Submission successful:', data);
+        const data = await response.json()
+        console.log('Submission successful:', data)
         toast({
           title: 'Success',
           description: 'Code submitted successfully for review',
-        });
-        setTitle('');
-        setDescription('');
-        loadSubmissions();
-        setActiveTab(1); // Switch to feedback tab
+        })
+        setTitle('')
+        setDescription('')
+        loadSubmissions()
+        setActiveTab(1) // Switch to feedback tab
       } else {
-        const errorText = await response.text();
-        let errorData;
+        const errorText = await response.text()
+        let errorData
         try {
-          errorData = JSON.parse(errorText);
+          errorData = JSON.parse(errorText)
         } catch (e) {
-          errorData = { detail: errorText || 'Failed to submit code' };
+          errorData = { detail: errorText || 'Failed to submit code' }
         }
-        console.error('Submission failed:', response.status, response.statusText, errorData);
+        console.error('Submission failed:', response.status, response.statusText, errorData)
         toast({
           variant: 'destructive',
           title: 'Error',
           description: errorData.detail || 'Failed to submit code',
-        });
+        })
       }
     } catch (error) {
-      console.error('Error submitting code:', error);
+      console.error('Error submitting code:', error)
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'An error occurred while submitting your code',
-      });
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
+    setActiveTab(newValue)
+  }
 
   const handleViewDetails = (submission: Submission) => {
-    setSelectedSubmission(submission);
-    loadReviews(submission.id);
-    setDetailsOpen(true);
-  };
+    setSelectedSubmission(submission)
+    loadReviews(submission.id)
+    setDetailsOpen(true)
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return 'success';
+        return 'success'
       case 'rejected':
-        return 'error';
+        return 'error'
       case 'revision_requested':
-        return 'warning';
+        return 'warning'
       default:
-        return 'default';
+        return 'default'
     }
-  };
+  }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
-  };
+    const date = new Date(dateString)
+    return date.toLocaleString()
+  }
 
   // Determine language based on code content
   const getLanguage = (content: string): string => {
     // Check for Python syntax
-    if (content.includes('def ') || content.includes('import ') || content.includes('class ') && content.includes(':')) {
-      return 'python';
+    if (
+      content.includes('def ') ||
+      content.includes('import ') ||
+      (content.includes('class ') && content.includes(':'))
+    ) {
+      return 'python'
     }
     // Check for JavaScript/TypeScript
-    else if (content.includes('function ') || content.includes('const ') || content.includes('let ') || content.includes('=>')) {
+    else if (
+      content.includes('function ') ||
+      content.includes('const ') ||
+      content.includes('let ') ||
+      content.includes('=>')
+    ) {
       // Check for TypeScript specific syntax
-      if (content.includes('interface ') || content.includes(':') && content.includes('type ') || content.includes('<T>')) {
-        return 'typescript';
+      if (
+        content.includes('interface ') ||
+        (content.includes(':') && content.includes('type ')) ||
+        content.includes('<T>')
+      ) {
+        return 'typescript'
       }
-      return 'javascript';
+      return 'javascript'
     }
     // Check for HTML
     else if (content.includes('<html') || content.includes('<body') || content.includes('<div')) {
-      return 'html';
+      return 'html'
     }
     // Check for CSS
-    else if (content.includes('{') && content.includes('}') && content.includes(':') && content.includes(';')) {
-      return 'css';
+    else if (
+      content.includes('{') &&
+      content.includes('}') &&
+      content.includes(':') &&
+      content.includes(';')
+    ) {
+      return 'css'
     }
     // Default to plaintext
-    return 'plaintext';
-  };
+    return 'plaintext'
+  }
 
   return (
     <Dialog
@@ -280,15 +298,12 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
       maxWidth="md"
       fullWidth
       PaperProps={{
-        sx: { height: '80vh' }
+        sx: { height: '80vh' },
       }}
     >
       <DialogTitle>
         Code Submission
-        <Button 
-          onClick={onClose}
-          sx={{ position: 'absolute', right: 8, top: 8 }}
-        >
+        <Button onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
           Close
         </Button>
       </DialogTitle>
@@ -361,11 +376,15 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
               <List>
                 {submissions.map((submission) => (
                   <React.Fragment key={submission.id}>
-                    <ListItem
-                      alignItems="flex-start"
-                      sx={{ flexDirection: 'column', py: 2 }}
-                    >
-                      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <ListItem alignItems="flex-start" sx={{ flexDirection: 'column', py: 2 }}>
+                      <Box
+                        sx={{
+                          width: '100%',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          mb: 1,
+                        }}
+                      >
                         <Typography variant="subtitle1">{submission.title}</Typography>
                         <Chip
                           label={submission.status}
@@ -373,18 +392,18 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
                           size="small"
                         />
                       </Box>
-                      
+
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         {formatDate(submission.created_at)}
                       </Typography>
-                      
+
                       {submission.description && (
                         <Typography variant="body2" sx={{ mb: 1 }}>
                           {submission.description.substring(0, 100)}
                           {submission.description.length > 100 ? '...' : ''}
                         </Typography>
                       )}
-                      
+
                       <Box sx={{ display: 'flex', gap: 1, alignSelf: 'flex-end', mt: 1 }}>
                         <Button
                           variant="outlined"
@@ -409,15 +428,8 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
 
         {/* Submission Details Dialog */}
         {selectedSubmission && (
-          <Dialog
-            open={detailsOpen}
-            onClose={() => setDetailsOpen(false)}
-            maxWidth="md"
-            fullWidth
-          >
-            <DialogTitle>
-              Submission Details
-            </DialogTitle>
+          <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth>
+            <DialogTitle>Submission Details</DialogTitle>
             <DialogContent dividers>
               <Typography variant="h6">{selectedSubmission.title}</Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -429,27 +441,31 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
                 size="small"
                 sx={{ mb: 2 }}
               />
-              
+
               {selectedSubmission.description && (
                 <>
-                  <Typography variant="subtitle1" sx={{ mt: 2 }}>Description</Typography>
+                  <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                    Description
+                  </Typography>
                   <Typography variant="body2" paragraph>
                     {selectedSubmission.description}
                   </Typography>
                 </>
               )}
-              
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>Code</Typography>
-              <Paper 
-                elevation={0} 
-                sx={{ 
+
+              <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                Code
+              </Typography>
+              <Paper
+                elevation={0}
+                sx={{
                   p: 0,
-                  height: '400px', 
+                  height: '400px',
                   bgcolor: 'background.default',
                   border: '1px solid',
                   borderColor: 'divider',
                   borderRadius: 1,
-                  overflow: 'hidden'
+                  overflow: 'hidden',
                 }}
               >
                 <Editor
@@ -466,8 +482,10 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
                   }}
                 />
               </Paper>
-              
-              <Typography variant="subtitle1" sx={{ mt: 3 }}>Reviews</Typography>
+
+              <Typography variant="subtitle1" sx={{ mt: 3 }}>
+                Reviews
+              </Typography>
               {reviews.length > 0 ? (
                 reviews.map((review) => (
                   <Paper
@@ -478,7 +496,7 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
                       mt: 2,
                       border: '1px solid',
                       borderColor: 'divider',
-                      borderRadius: 1
+                      borderRadius: 1,
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -491,46 +509,52 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
                         {formatDate(review.created_at)}
                       </Typography>
                     </Box>
-                    
+
                     {review.quality_before_edits && (
                       <Typography variant="body2" sx={{ mt: 1 }}>
                         Quality before edits: {review.quality_before_edits}/5
                       </Typography>
                     )}
-                    
+
                     {review.quality_after_edits && (
                       <Typography variant="body2" sx={{ mt: 1 }}>
                         Quality after edits: {review.quality_after_edits}/5
                       </Typography>
                     )}
-                    
+
                     {review.is_customer_ready !== undefined && (
                       <Typography variant="body2" sx={{ mt: 1 }}>
                         Customer ready: {review.is_customer_ready ? 'Yes' : 'No'}
                       </Typography>
                     )}
-                    
+
                     {review.edits_made && (
                       <>
-                        <Typography variant="subtitle2" sx={{ mt: 2 }}>Edits Made</Typography>
+                        <Typography variant="subtitle2" sx={{ mt: 2 }}>
+                          Edits Made
+                        </Typography>
                         <Typography variant="body2" paragraph>
                           {review.edits_made}
                         </Typography>
                       </>
                     )}
-                    
+
                     {review.comments && (
                       <>
-                        <Typography variant="subtitle2" sx={{ mt: 2 }}>Comments</Typography>
+                        <Typography variant="subtitle2" sx={{ mt: 2 }}>
+                          Comments
+                        </Typography>
                         <Typography variant="body2" paragraph>
                           {review.comments}
                         </Typography>
                       </>
                     )}
-                    
+
                     {review.feedback && (
                       <>
-                        <Typography variant="subtitle2" sx={{ mt: 2 }}>Feedback</Typography>
+                        <Typography variant="subtitle2" sx={{ mt: 2 }}>
+                          Feedback
+                        </Typography>
                         <Typography variant="body2" paragraph>
                           {review.feedback}
                         </Typography>
@@ -551,7 +575,7 @@ export function CodeSubmission({ onClose, currentFile, sessionId }: CodeSubmissi
         )}
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
-export default CodeSubmission; 
+export default CodeSubmission

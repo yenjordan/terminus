@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Paper,
@@ -23,150 +23,159 @@ import {
   FormGroup,
   FormControl,
   FormLabel,
-  Grid
-} from '@mui/material';
-import Editor from '@monaco-editor/react';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@mui/material/styles';
+  Grid,
+} from '@mui/material'
+import Editor from '@monaco-editor/react'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '@/hooks/use-toast'
+import { useTheme } from '@mui/material/styles'
 
 interface CodeReviewProps {
-  onClose: () => void;
+  onClose: () => void
 }
 
 interface Submission {
-  id: number;
-  title: string;
-  description: string;
-  code_content: string;
-  status: 'pending' | 'approved' | 'rejected' | 'revision_requested';
-  created_at: string;
-  submitter_id: number;
+  id: number
+  title: string
+  description: string
+  code_content: string
+  status: 'pending' | 'approved' | 'rejected' | 'revision_requested'
+  created_at: string
+  submitter_id: number
 }
 
 interface Review {
-  id: number;
-  submission_id: number;
-  reviewer_id: number;
-  status: string;
-  comments: string;
-  feedback: string;
-  quality_before_edits: number;
-  quality_after_edits: number;
-  edits_made: string;
-  is_customer_ready: boolean;
-  created_at: string;
+  id: number
+  submission_id: number
+  reviewer_id: number
+  status: string
+  comments: string
+  feedback: string
+  quality_before_edits: number
+  quality_after_edits: number
+  edits_made: string
+  is_customer_ready: boolean
+  created_at: string
 }
 
 export function CodeReview({ onClose }: CodeReviewProps) {
-  const { token } = useAuth();
-  const { toast } = useToast();
-  const theme = useTheme();
-  const isDarkMode = theme.palette.mode === 'dark';
-  const [activeTab, setActiveTab] = useState(0);
-  const [pendingSubmissions, setPendingSubmissions] = useState<Submission[]>([]);
-  const [completedSubmissions, setCompletedSubmissions] = useState<Submission[]>([]);
-  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [reviewOpen, setReviewOpen] = useState(false);
+  const { token } = useAuth()
+  const { toast } = useToast()
+  const theme = useTheme()
+  const isDarkMode = theme.palette.mode === 'dark'
+  const [activeTab, setActiveTab] = useState(0)
+  const [pendingSubmissions, setPendingSubmissions] = useState<Submission[]>([])
+  const [completedSubmissions, setCompletedSubmissions] = useState<Submission[]>([])
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
+  const [reviewOpen, setReviewOpen] = useState(false)
 
   // Review form state
-  const [reviewStatus, setReviewStatus] = useState<'approved' | 'rejected' | 'revision_requested'>('approved');
-  const [comments, setComments] = useState('');
-  const [feedback, setFeedback] = useState('');
-  const [qualityBefore, setQualityBefore] = useState<number | null>(null);
-  const [qualityAfter, setQualityAfter] = useState<number | null>(null);
-  const [editsMade, setEditsMade] = useState('');
-  const [isCustomerReady, setIsCustomerReady] = useState(false);
+  const [reviewStatus, setReviewStatus] = useState<'approved' | 'rejected' | 'revision_requested'>(
+    'approved'
+  )
+  const [comments, setComments] = useState('')
+  const [feedback, setFeedback] = useState('')
+  const [qualityBefore, setQualityBefore] = useState<number | null>(null)
+  const [qualityAfter, setQualityAfter] = useState<number | null>(null)
+  const [editsMade, setEditsMade] = useState('')
+  const [isCustomerReady, setIsCustomerReady] = useState(false)
 
   useEffect(() => {
     if (token) {
-      loadSubmissions();
+      loadSubmissions()
     }
-  }, [token]);
+  }, [token])
 
   const loadSubmissions = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       // Load pending submissions
       const pendingResponse = await fetch('/api/code-review/submissions/?status_filter=pending', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       // Load completed submissions (approved or rejected)
-      const completedResponse = await fetch('/api/code-review/submissions/?status_filter=approved,rejected', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const completedResponse = await fetch(
+        '/api/code-review/submissions/?status_filter=approved,rejected',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
 
       if (pendingResponse.ok && completedResponse.ok) {
-        const pendingData = await pendingResponse.json();
-        const completedData = await completedResponse.json();
-        
-        console.log('Pending submissions:', pendingData);
-        console.log('Completed submissions:', completedData);
-        
-        setPendingSubmissions(pendingData);
-        setCompletedSubmissions(completedData);
+        const pendingData = await pendingResponse.json()
+        const completedData = await completedResponse.json()
+
+        console.log('Pending submissions:', pendingData)
+        console.log('Completed submissions:', completedData)
+
+        setPendingSubmissions(pendingData)
+        setCompletedSubmissions(completedData)
       } else {
-        console.error('Failed to load submissions:', 
-          pendingResponse.status, pendingResponse.statusText,
-          completedResponse.status, completedResponse.statusText);
+        console.error(
+          'Failed to load submissions:',
+          pendingResponse.status,
+          pendingResponse.statusText,
+          completedResponse.status,
+          completedResponse.statusText
+        )
         toast({
           variant: 'destructive',
           title: 'Error',
           description: 'Failed to load submissions',
-        });
+        })
       }
     } catch (error) {
-      console.error('Error loading submissions:', error);
+      console.error('Error loading submissions:', error)
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to load submissions',
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
+    setActiveTab(newValue)
+  }
 
   const handleViewDetails = (submission: Submission) => {
-    setSelectedSubmission(submission);
-    setDetailsOpen(true);
-  };
+    setSelectedSubmission(submission)
+    setDetailsOpen(true)
+  }
 
   const handleReviewSubmission = (submission: Submission) => {
-    setSelectedSubmission(submission);
+    setSelectedSubmission(submission)
     // Reset review form
-    setReviewStatus('approved');
-    setComments('');
-    setFeedback('');
-    setQualityBefore(null);
-    setQualityAfter(null);
-    setEditsMade('');
-    setIsCustomerReady(false);
-    setReviewOpen(true);
-  };
+    setReviewStatus('approved')
+    setComments('')
+    setFeedback('')
+    setQualityBefore(null)
+    setQualityAfter(null)
+    setEditsMade('')
+    setIsCustomerReady(false)
+    setReviewOpen(true)
+  }
 
   const handleSubmitReview = async () => {
-    if (!selectedSubmission) return;
+    if (!selectedSubmission) return
 
     if (qualityBefore === null) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Please rate the quality before edits',
-      });
-      return;
+      })
+      return
     }
 
     if (qualityAfter === null) {
@@ -174,100 +183,121 @@ export function CodeReview({ onClose }: CodeReviewProps) {
         variant: 'destructive',
         title: 'Error',
         description: 'Please rate the quality after edits',
-      });
-      return;
+      })
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
-      const response = await fetch(`/api/code-review/submissions/${selectedSubmission.id}/reviews/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          status: reviewStatus,
-          comments: comments,
-          feedback: feedback,
-          quality_before_edits: qualityBefore,
-          quality_after_edits: qualityAfter,
-          edits_made: editsMade,
-          is_customer_ready: isCustomerReady
-        }),
-      });
+      const response = await fetch(
+        `/api/code-review/submissions/${selectedSubmission.id}/reviews/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            status: reviewStatus,
+            comments: comments,
+            feedback: feedback,
+            quality_before_edits: qualityBefore,
+            quality_after_edits: qualityAfter,
+            edits_made: editsMade,
+            is_customer_ready: isCustomerReady,
+          }),
+        }
+      )
 
       if (response.ok) {
         toast({
           title: 'Success',
           description: 'Review submitted successfully',
-        });
-        setReviewOpen(false);
-        loadSubmissions(); // Refresh the submissions list
+        })
+        setReviewOpen(false)
+        loadSubmissions() // Refresh the submissions list
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json()
         toast({
           variant: 'destructive',
           title: 'Error',
           description: errorData.detail || 'Failed to submit review',
-        });
+        })
       }
     } catch (error) {
-      console.error('Error submitting review:', error);
+      console.error('Error submitting review:', error)
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'An error occurred while submitting your review',
-      });
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return 'success';
+        return 'success'
       case 'rejected':
-        return 'error';
+        return 'error'
       case 'revision_requested':
-        return 'warning';
+        return 'warning'
       default:
-        return 'default';
+        return 'default'
     }
-  };
+  }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
-  };
+    const date = new Date(dateString)
+    return date.toLocaleString()
+  }
 
   // Determine language based on code content
   const getLanguage = (content: string): string => {
     // Check for Python syntax
-    if (content.includes('def ') || content.includes('import ') || content.includes('class ') && content.includes(':')) {
-      return 'python';
+    if (
+      content.includes('def ') ||
+      content.includes('import ') ||
+      (content.includes('class ') && content.includes(':'))
+    ) {
+      return 'python'
     }
     // Check for JavaScript/TypeScript
-    else if (content.includes('function ') || content.includes('const ') || content.includes('let ') || content.includes('=>')) {
+    else if (
+      content.includes('function ') ||
+      content.includes('const ') ||
+      content.includes('let ') ||
+      content.includes('=>')
+    ) {
       // Check for TypeScript specific syntax
-      if (content.includes('interface ') || content.includes(':') && content.includes('type ') || content.includes('<T>')) {
-        return 'typescript';
+      if (
+        content.includes('interface ') ||
+        (content.includes(':') && content.includes('type ')) ||
+        content.includes('<T>')
+      ) {
+        return 'typescript'
       }
-      return 'javascript';
+      return 'javascript'
     }
     // Check for HTML
     else if (content.includes('<html') || content.includes('<body') || content.includes('<div')) {
-      return 'html';
+      return 'html'
     }
     // Check for CSS
-    else if (content.includes('{') && content.includes('}') && content.includes(':') && content.includes(';')) {
-      return 'css';
+    else if (
+      content.includes('{') &&
+      content.includes('}') &&
+      content.includes(':') &&
+      content.includes(';')
+    ) {
+      return 'css'
     }
     // Default to plaintext
-    return 'plaintext';
-  };
+    return 'plaintext'
+  }
 
   return (
     <Dialog
@@ -276,15 +306,12 @@ export function CodeReview({ onClose }: CodeReviewProps) {
       maxWidth="md"
       fullWidth
       PaperProps={{
-        sx: { height: '80vh' }
+        sx: { height: '80vh' },
       }}
     >
       <DialogTitle>
         Code Review
-        <Button 
-          onClick={onClose}
-          sx={{ position: 'absolute', right: 8, top: 8 }}
-        >
+        <Button onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
           Close
         </Button>
       </DialogTitle>
@@ -310,11 +337,15 @@ export function CodeReview({ onClose }: CodeReviewProps) {
               <List>
                 {pendingSubmissions.map((submission) => (
                   <React.Fragment key={submission.id}>
-                    <ListItem
-                      alignItems="flex-start"
-                      sx={{ flexDirection: 'column', py: 2 }}
-                    >
-                      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <ListItem alignItems="flex-start" sx={{ flexDirection: 'column', py: 2 }}>
+                      <Box
+                        sx={{
+                          width: '100%',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          mb: 1,
+                        }}
+                      >
                         <Typography variant="subtitle1">{submission.title}</Typography>
                         <Chip
                           label={submission.status}
@@ -322,18 +353,18 @@ export function CodeReview({ onClose }: CodeReviewProps) {
                           size="small"
                         />
                       </Box>
-                      
+
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         {formatDate(submission.created_at)}
                       </Typography>
-                      
+
                       {submission.description && (
                         <Typography variant="body2" sx={{ mb: 1 }}>
                           {submission.description.substring(0, 100)}
                           {submission.description.length > 100 ? '...' : ''}
                         </Typography>
                       )}
-                      
+
                       <Box sx={{ display: 'flex', gap: 1, alignSelf: 'flex-end', mt: 1 }}>
                         <Button
                           variant="outlined"
@@ -377,11 +408,15 @@ export function CodeReview({ onClose }: CodeReviewProps) {
               <List>
                 {completedSubmissions.map((submission) => (
                   <React.Fragment key={submission.id}>
-                    <ListItem
-                      alignItems="flex-start"
-                      sx={{ flexDirection: 'column', py: 2 }}
-                    >
-                      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <ListItem alignItems="flex-start" sx={{ flexDirection: 'column', py: 2 }}>
+                      <Box
+                        sx={{
+                          width: '100%',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          mb: 1,
+                        }}
+                      >
                         <Typography variant="subtitle1">{submission.title}</Typography>
                         <Chip
                           label={submission.status}
@@ -389,18 +424,18 @@ export function CodeReview({ onClose }: CodeReviewProps) {
                           size="small"
                         />
                       </Box>
-                      
+
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         {formatDate(submission.created_at)}
                       </Typography>
-                      
+
                       {submission.description && (
                         <Typography variant="body2" sx={{ mb: 1 }}>
                           {submission.description.substring(0, 100)}
                           {submission.description.length > 100 ? '...' : ''}
                         </Typography>
                       )}
-                      
+
                       <Box sx={{ display: 'flex', gap: 1, alignSelf: 'flex-end', mt: 1 }}>
                         <Button
                           variant="outlined"
@@ -425,15 +460,8 @@ export function CodeReview({ onClose }: CodeReviewProps) {
 
         {/* Submission Details Dialog */}
         {selectedSubmission && (
-          <Dialog
-            open={detailsOpen}
-            onClose={() => setDetailsOpen(false)}
-            maxWidth="md"
-            fullWidth
-          >
-            <DialogTitle>
-              Submission Details
-            </DialogTitle>
+          <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth>
+            <DialogTitle>Submission Details</DialogTitle>
             <DialogContent dividers>
               <Typography variant="h6">{selectedSubmission.title}</Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -445,27 +473,31 @@ export function CodeReview({ onClose }: CodeReviewProps) {
                 size="small"
                 sx={{ mb: 2 }}
               />
-              
+
               {selectedSubmission.description && (
                 <>
-                  <Typography variant="subtitle1" sx={{ mt: 2 }}>Description</Typography>
+                  <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                    Description
+                  </Typography>
                   <Typography variant="body2" paragraph>
                     {selectedSubmission.description}
                   </Typography>
                 </>
               )}
-              
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>Code</Typography>
-              <Paper 
-                elevation={0} 
-                sx={{ 
+
+              <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                Code
+              </Typography>
+              <Paper
+                elevation={0}
+                sx={{
                   p: 0,
-                  height: '400px', 
+                  height: '400px',
                   bgcolor: 'background.default',
                   border: '1px solid',
                   borderColor: 'divider',
                   borderRadius: 1,
-                  overflow: 'hidden'
+                  overflow: 'hidden',
                 }}
               >
                 <Editor
@@ -486,11 +518,11 @@ export function CodeReview({ onClose }: CodeReviewProps) {
             <DialogActions>
               <Button onClick={() => setDetailsOpen(false)}>Close</Button>
               {selectedSubmission.status === 'pending' && (
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   onClick={() => {
-                    setDetailsOpen(false);
-                    handleReviewSubmission(selectedSubmission);
+                    setDetailsOpen(false)
+                    handleReviewSubmission(selectedSubmission)
                   }}
                 >
                   Review This Submission
@@ -508,27 +540,27 @@ export function CodeReview({ onClose }: CodeReviewProps) {
             maxWidth="lg"
             fullWidth
             PaperProps={{
-              sx: { height: '90vh' }
+              sx: { height: '90vh' },
             }}
           >
-            <DialogTitle>
-              Review Submission: {selectedSubmission.title}
-            </DialogTitle>
+            <DialogTitle>Review Submission: {selectedSubmission.title}</DialogTitle>
             <DialogContent dividers>
               <Grid container spacing={2}>
                 {/* Left side - Code content */}
                 <Grid item xs={6}>
-                  <Typography variant="subtitle1" sx={{ mb: 1 }}>Code to Review</Typography>
-                  <Paper 
-                    elevation={0} 
-                    sx={{ 
-                      p: 0, 
+                  <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                    Code to Review
+                  </Typography>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 0,
                       height: 'calc(100% - 40px)',
                       bgcolor: 'background.default',
                       border: '1px solid',
                       borderColor: 'divider',
                       borderRadius: 1,
-                      overflow: 'hidden'
+                      overflow: 'hidden',
                     }}
                   >
                     <Editor
@@ -546,7 +578,7 @@ export function CodeReview({ onClose }: CodeReviewProps) {
                     />
                   </Paper>
                 </Grid>
-                
+
                 {/* Right side - Review form */}
                 <Grid item xs={6}>
                   <Box sx={{ mb: 3 }}>
@@ -573,7 +605,7 @@ export function CodeReview({ onClose }: CodeReviewProps) {
                           name="quality-before"
                           value={qualityBefore}
                           onChange={(event, newValue) => {
-                            setQualityBefore(newValue);
+                            setQualityBefore(newValue)
                           }}
                           max={5}
                           size="large"
@@ -598,7 +630,7 @@ export function CodeReview({ onClose }: CodeReviewProps) {
                           name="quality-after"
                           value={qualityAfter}
                           onChange={(event, newValue) => {
-                            setQualityAfter(newValue);
+                            setQualityAfter(newValue)
                           }}
                           max={5}
                           size="large"
@@ -642,14 +674,11 @@ export function CodeReview({ onClose }: CodeReviewProps) {
               </Grid>
             </DialogContent>
             <DialogActions>
-              <Button 
-                onClick={() => setReviewOpen(false)} 
-                disabled={isSubmitting}
-              >
+              <Button onClick={() => setReviewOpen(false)} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 onClick={handleSubmitReview}
                 disabled={isSubmitting || qualityBefore === null || qualityAfter === null}
               >
@@ -667,7 +696,7 @@ export function CodeReview({ onClose }: CodeReviewProps) {
         )}
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
-export default CodeReview; 
+export default CodeReview

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import {
   AppBar,
   Box,
@@ -11,26 +11,26 @@ import {
   ThemeProvider,
   createTheme,
   IconButton,
-  useMediaQuery
-} from '@mui/material';
-import { 
-  Code as CodeIcon, 
+  useMediaQuery,
+} from '@mui/material'
+import {
+  Code as CodeIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
   Login as LoginIcon,
   Logout as LogoutIcon,
-  AppRegistration as RegisterIcon
-} from '@mui/icons-material';
+  AppRegistration as RegisterIcon,
+} from '@mui/icons-material'
 
 const RootLayout = () => {
-  const { isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
-  const [darkMode, setDarkMode] = React.useState(true);
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  
+  const { isAuthenticated, logout } = useAuth()
+  const navigate = useNavigate()
+  const [darkMode, setDarkMode] = React.useState(true)
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+
   React.useEffect(() => {
-    setDarkMode(prefersDarkMode);
-  }, [prefersDarkMode]);
+    setDarkMode(prefersDarkMode)
+  }, [prefersDarkMode])
 
   const theme = React.useMemo(
     () =>
@@ -52,17 +52,17 @@ const RootLayout = () => {
           fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
         },
       }),
-    [darkMode],
-  );
+    [darkMode]
+  )
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+    logout()
+    navigate('/login')
+  }
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+    setDarkMode(!darkMode)
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -83,10 +83,18 @@ const RootLayout = () => {
               </Button>
             ) : (
               <>
-                <Button color="inherit" onClick={() => navigate('/login')} startIcon={<LoginIcon />}>
+                <Button
+                  color="inherit"
+                  onClick={() => navigate('/login')}
+                  startIcon={<LoginIcon />}
+                >
                   Login
                 </Button>
-                <Button color="inherit" onClick={() => navigate('/register')} startIcon={<RegisterIcon />}>
+                <Button
+                  color="inherit"
+                  onClick={() => navigate('/register')}
+                  startIcon={<RegisterIcon />}
+                >
                   Register
                 </Button>
               </>
@@ -98,7 +106,7 @@ const RootLayout = () => {
         </Box>
       </Box>
     </ThemeProvider>
-  );
-};
+  )
+}
 
-export default RootLayout;
+export default RootLayout
