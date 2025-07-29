@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Terminal window background -->
+  <rect x="2" y="4" width="20" height="16" rx="2" fill="#1e1e1e" />
+  
+  <!-- Terminal window header -->
+  <rect x="2" y="4" width="20" height="3" rx="1" fill="#333333" />
+  
+  <!-- Terminal window controls -->
+  <circle cx="4.5" cy="5.5" r="0.7" fill="#ff5f57" />
+  <circle cx="7" cy="5.5" r="0.7" fill="#febc2e" />
+  <circle cx="9.5" cy="5.5" r="0.7" fill="#28c840" />
+  
+  <!-- Terminal text/cursor -->
+  <path d="M5 10L8 12L5 14" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  <line x1="10" y1="15" x2="14" y2="15" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round" />
+</svg> 
